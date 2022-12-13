@@ -2,27 +2,26 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.WindowConstants;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.event.*;
 
-public class Finestra extends JFrame implements MouseListener{
+public class Finestra extends JFrame implements MouseListener, ListSelectionListener{
     Rubrica r = new Rubrica();
     String column[]={"NOME","NUMERO DI TELEFONO"};
     JButton bottone = new JButton(" INVIA NOME");
     JLabel label = new JLabel("INSERISCI NOME E NUMERO DI TELEFONO");
     JLabel label2 = new JLabel();
     JLabel nome = new JLabel("NOME");
-    JLabel numero = new JLabel("NUMERO");
     JTextField text = new JTextField();
     JTextField text2 = new JTextField();
-    JScrollPane scroll = new JScrollPane();
-    JScrollPane scroll2 = new JScrollPane();
+    JList <String> list = new JList<>(r.toArrayNum());
+    JList <String> list2 = new JList<>(r.toArrayNum());
 
     Finestra(){
         this.setSize(800, 600);
-        this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setVisible(true);
         this.setTitle("Rubrica");
         this.setLayout(null);
@@ -32,11 +31,9 @@ public class Finestra extends JFrame implements MouseListener{
         this.add(label);
         this.add(label2);
         this.add(nome);
-        this.add(numero);
         this.add(text);
         this.add(text2);
-        this.add(scroll);
-        this.add(scroll2);
+        this.add(list);
         
         bottone.setBounds(400, 200, 300, 50);
         bottone.setLayout(null);
@@ -55,10 +52,6 @@ public class Finestra extends JFrame implements MouseListener{
         nome.setLayout(null);
         nome.setFocusable(false);
 
-        numero.setBounds(170, 10, 145, 50);
-        numero.setLayout(null);
-        numero.setFocusable(false);
-
         text.setBounds(400, 100, 145, 50);
         text.setLayout(null);
         text.setFocusable(true);
@@ -68,10 +61,9 @@ public class Finestra extends JFrame implements MouseListener{
         text2.setLayout(null);
         text2.setFocusable(true);
         text2.addMouseListener(this);
-        
-        scroll.setBounds(10, 50, 150, 480);
 
-        scroll2.setBounds(170, 50, 150, 480);
+        list.setBounds(10, 50, 150, 480);
+        list.addListSelectionListener(this);
 
     }
 
@@ -79,6 +71,7 @@ public class Finestra extends JFrame implements MouseListener{
     public void mouseClicked(MouseEvent e) {     
         String nome;
         String numero;
+        label2.setText("");
         if(e.getSource() == bottone){
             if(text.getText().equals("") || text2.getText().equals("")){
                 label2.setText("INSERISCI NOME E NUMERO DI TELEFONO!");
@@ -89,11 +82,10 @@ public class Finestra extends JFrame implements MouseListener{
             r.add(nome, numero);
             text.setText("");
             text2.setText("");
-            JList<String> list = new JList<>(r.toArray(r)); 
-            scroll.setViewportView(list);
-            scroll2.setViewportView(new JList<>(r.toArrayNum()));
+            list.setListData(r.toArray(r));
+            label2.setText("INSERIMENTO EFFETTUATO!");
         }
-        r.print(r);
+        
     }
   
 
@@ -115,6 +107,17 @@ public class Finestra extends JFrame implements MouseListener{
     @Override
     public void mouseExited(MouseEvent e) {
         
+    }
+
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        if(!e.getValueIsAdjusting()) {
+            String nome = list.getSelectedValue();
+            FinestraNumeri f = new FinestraNumeri(r, nome);
+            f.setVisible(true);
+        }
+        list.revalidate();
+
     }
 
 }
